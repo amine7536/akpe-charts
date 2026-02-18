@@ -25,20 +25,15 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: {{ $.Release.Name }}
-  sources:
-    - repoURL: "{{ index $.Values.serviceRepos .name }}"
-      targetRevision: {{ if .commitSha }}{{ .commitSha }}{{ else }}main{{ end }}
-      ref: svcvalues
-    - chart: {{ $.Values.serviceChart.name }}
-      repoURL: {{ $.Values.serviceChart.repository }}
-      targetRevision: {{ $.Values.serviceChart.version }}
-      helm:
-        releaseName: {{ .name }}
-        parameters:
-          - name: image.tag
-            value: {{ if .commitSha }}{{ .commitSha | quote }}{{ else }}"$ARGOCD_APP_REVISION"{{ end }}
-        valueFiles:
-          - "$svcvalues/k8s/values.yaml"
+  source:
+    repoURL: "{{ index $.Values.serviceRepos .name }}"
+    targetRevision: {{ if .commitSha }}{{ .commitSha }}{{ else }}main{{ end }}
+    path: k8s/
+    helm:
+      releaseName: {{ .name }}
+      parameters:
+        - name: app.image.tag
+          value: {{ if .commitSha }}{{ .commitSha | quote }}{{ else }}"$ARGOCD_APP_REVISION"{{ end }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ $.Release.Name }}

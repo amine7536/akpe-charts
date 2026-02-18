@@ -4,8 +4,3 @@ services:
 
 serviceRepos:
   backend-1: "https://github.com/amine7536/akpe-backend-1.git"
-
-serviceChart:
-  repository: "oci://ghcr.io/amine7536/akpe-charts"
-  name: akpe-service
-  version: "0.1.0"

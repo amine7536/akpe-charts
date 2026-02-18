@@ -18,7 +18,6 @@ spec:
     {{- range $.Values.serviceRepos }}
     - {{ . | quote }}
     {{- end }}
-    - {{ $.Values.serviceChart.repository | quote }}
   destinations:
     - namespace: {{ .Release.Name }}
       server: https://kubernetes.default.svc

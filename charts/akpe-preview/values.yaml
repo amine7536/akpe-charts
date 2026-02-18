@@ -16,8 +16,3 @@
 #   - name: front
 
 services: []
-
-serviceChart:
-  repository: "oci://ghcr.io/amine7536/akpe-charts"
-  name: akpe-service
-  version: "0.1.0"
