@@ -27,9 +27,10 @@ jobs:
       - name: Package and push charts
         run: |
           for chart in charts/*/; do
-            chart_name=$(basename "$chart")
-            echo "Packaging $chart_name..."
+            chart_name=$(yq '.name' "$chart/Chart.yaml")
+            chart_version=$(yq '.version' "$chart/Chart.yaml")
+            echo "Packaging $chart_name ($chart_version)..."
             helm package "$chart" -d /tmp/charts
             echo "Pushing $chart_name..."
-            helm push "/tmp/charts/${chart_name}-"*.tgz oci://ghcr.io/amine7536/akpe-charts
+            helm push "/tmp/charts/${chart_name}-${chart_version}.tgz" oci://ghcr.io/amine7536/akpe-charts
           done
