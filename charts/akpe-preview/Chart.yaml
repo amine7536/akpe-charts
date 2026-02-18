@@ -1,0 +1,4 @@
+apiVersion: v2
+name: preview-env
+description: Shared Helm chart for preview environments
+version: 0.1.0

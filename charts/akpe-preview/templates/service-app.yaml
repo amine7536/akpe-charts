@@ -1,0 +1,50 @@
+{{- range .Values.services }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $.Release.Name }}-{{ .name }}
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: {{ .name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/part-of: preview-environments
+    app.kubernetes.io/managed-by: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    preview.akpe.io/vcs.ref.revision: {{ .commitSha | default "" | quote }}
+    {{- if .metadata }}
+    preview.akpe.io/pr-author: {{ index .metadata "pr-author" | quote }}
+    preview.akpe.io/pr-url: {{ index .metadata "pr-url" | quote }}
+    preview.akpe.io/pr-number: {{ index .metadata "pr-number" | quote }}
+    preview.akpe.io/created-at: {{ index .metadata "created-at" | quote }}
+    preview.akpe.io/updated-at: {{ index .metadata "updated-at" | quote }}
+    preview.akpe.io/vcs.ref.name: {{ index .metadata "vcs.ref.name" | quote }}
+    preview.akpe.io/cicd.pipeline.run.url: {{ index .metadata "cicd.pipeline.run.url" | quote }}
+    {{- end }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ $.Release.Name }}
+  sources:
+    - repoURL: "{{ index $.Values.serviceRepos .name }}"
+      targetRevision: {{ if .commitSha }}{{ .commitSha }}{{ else }}main{{ end }}
+      ref: svcvalues
+    - chart: {{ $.Values.serviceChart.name }}
+      repoURL: {{ $.Values.serviceChart.repository }}
+      targetRevision: {{ $.Values.serviceChart.version }}
+      helm:
+        releaseName: {{ .name }}
+        parameters:
+          - name: image.tag
+            value: {{ if .commitSha }}{{ .commitSha | quote }}{{ else }}"$ARGOCD_APP_REVISION"{{ end }}
+        valueFiles:
+          - "$svcvalues/k8s/values.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ $.Release.Name }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+{{- end }}

@@ -1,0 +1,31 @@
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8080
+
+ingress:
+  enabled: false
+  host: ""
+
+healthCheck:
+  path: /health
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readinessProbe:
+    initialDelaySeconds: 3
+    periodSeconds: 5
+
+postgres:
+  enabled: false
+  host: ""
+  port: 5432
+  superuser: ""
+  superuserPassword: ""
+
+env: {}

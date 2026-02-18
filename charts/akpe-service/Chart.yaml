@@ -1,0 +1,5 @@
+apiVersion: v2
+name: akpe-service
+description: Unified Helm chart for AKPE services
+version: 0.1.0
+appVersion: "0.1.0"
