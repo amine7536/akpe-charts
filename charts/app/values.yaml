@@ -38,7 +38,7 @@ postgres:
   superuser: ""
   superuserPassword: ""
   credentialsSecret: ""
-  initImage: "bitnami/postgresql:16"
+  initImage: "postgres:16-alpine"
   migrationsPath: /migrations
 
 env: {}
