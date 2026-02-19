@@ -1,24 +1,25 @@
-{{- $name := include "akpe-service.name" . -}}
+{{- $name := include "app.name" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $name }}
   labels:
-    app: {{ $name }}
+    {{- include "app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $name }}
+      {{- include "app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ $name }}
+        {{- include "app.labels" . | nindent 8 }}
+        {{- include "app.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.postgres.enabled }}
       initContainers:
         - name: pg-setup
-          image: bitnami/postgresql:latest
+          image: {{ .Values.postgres.initImage | quote }}
           imagePullPolicy: IfNotPresent
           env:
             - name: PGHOST
@@ -63,7 +64,7 @@ spec:
           command:
             - migrate
             - -path
-            - /migrations
+            - {{ .Values.postgres.migrationsPath }}
             - -database
             - {{ printf "postgres://%s:%s@%s:%v/%s?sslmode=disable" $name $name .Values.postgres.host .Values.postgres.port $name | quote }}
             - up
@@ -74,6 +75,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port }}
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
           env:
             - name: PORT
               value: "{{ .Values.service.port }}"

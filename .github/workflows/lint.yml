@@ -27,10 +27,10 @@ jobs:
             helm lint "$chart"
           done
 
-      - name: Helm template (akpe-service)
+      - name: Helm template (app)
         run: |
-          helm template test-release charts/akpe-service \
-            -f charts/akpe-service/ci/test-values.yaml
+          helm template test-release charts/app \
+            -f charts/app/ci/test-values.yaml
 
       - name: CT lint
         run: ct lint --config ct.yaml
