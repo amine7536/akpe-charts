@@ -27,5 +27,6 @@ postgres:
   port: 5432
   superuser: ""
   superuserPassword: ""
+  credentialsSecret: ""
 
 env: {}

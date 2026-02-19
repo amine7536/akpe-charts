@@ -25,10 +25,20 @@ spec:
               value: {{ .Values.postgres.host | quote }}
             - name: PGPORT
               value: {{ .Values.postgres.port | quote }}
+            {{- if .Values.postgres.credentialsSecret }}
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.credentialsSecret }}
+                  key: superuser-password
+            {{- else }}
             - name: PGUSER
               value: {{ .Values.postgres.superuser | quote }}
             - name: PGPASSWORD
               value: {{ .Values.postgres.superuserPassword | quote }}
+            {{- end }}
           command:
             - sh
             - -ce
